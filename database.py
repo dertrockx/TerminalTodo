@@ -1,0 +1,97 @@
+import sqlite3
+
+# A class to handle to database queries and connections
+class Model:
+	# to handel the database name
+	def __init__(self, database_name):
+		# instatiate the global database_name to 'database_name'
+		self.database_name = database_name
+		self.init_database()
+
+	# called as soon as this model is instatiate
+	def init_database(self):
+		try:
+			# starts a connection to the database
+			connection = sqlite3.connect(self.database_name)
+			cursor = connection.cursor()
+			# Create a table in the database named Todo if it still doesn't exist
+			cursor.executescript('''
+								CREATE TABLE IF NOT EXISTS Todo(Name TEXT, Status BOOLEAN);
+					''')
+			# commit the changes to the database
+			connection.commit()
+			print("Successfully created database")
+		# Checks if there's an error
+		except sqlite3.Error:
+			if connection:
+				print("Error in initiating database!")
+				print(sqlite3.Error)
+				connection.rollback()
+		finally:
+			if connection:
+				connection.close()
+				print("Successfully initiated database!")
+
+	def read_database(self):
+		try:
+			connection = sqlite3.connect(self.database_name)
+			cursor = connection.cursor()
+			cursor.execute('SELECT rowid, Name, Status FROM Todo')
+			data = cursor.fetchall()
+			print("Successfully grabbed data")
+		except sqlite3.Error:
+			if connection:
+				print("Error in retrieving data! Rolling back to previous status")
+				print(sqlite3.Error)
+				connection.rollback()
+		finally:
+			if connection:
+				connection.close()
+				print("Successfully retrieved data!")
+			if data:
+				return data
+			else:
+				return "No entry in database"
+
+
+	def write_data(self, task):
+		try:
+			connection = sqlite3.connect(self.database_name)
+			sql = ("INSERT INTO Todo(Name, Status) VALUES('" + task+ "', 0);")
+			
+			cursor = connection.cursor()
+			
+			#print(sql)
+			cursor.executescript(sql)
+			
+			connection.commit()
+			
+		except sqlite3.Error:
+			if connection:
+				print("Error in writing data! Rolling back to previous status")
+				print(sqlite3.Error)
+				connection.rollback()
+		finally:
+			if connection:
+				connection.close()
+				print("Successfully wrote data!")
+
+	# A method to update data from an existing entry in the database
+	def update_data(self, **kwargs):
+		try:
+			connection = sqlite3.connect(self.database_name)
+			# Creates the database query using the data from the **kwargs
+			sql = ("UPDATE Todo SET Name = '" + kwargs['text'] + "' where rowid = " + kwargs['row_id'])
+			cursor = connection.cursor()
+			cursor.executescript(sql)
+			connection.commit()
+		except sqlite3.Error:
+			if connection:
+				print("Error in updating data of row " + kwargs['row_id'] + ". Rolling back to preivous status...")
+				connection.rollback()
+		finally:
+			if connection:
+				connection.close()
+				print("Successfully updated data of row "+ kwargs['row_id'])
+
+		
