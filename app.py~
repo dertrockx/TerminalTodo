@@ -17,7 +17,7 @@ class Main:
 					What do you want to do? \n 
 					1. Write a new todo \n 
 					2. Update an item in your list \n 
-					3. Delete an item in your list \n
+					3. Delete an item in your list
 					4. Exit 
 					""")
 				input_data = input("Choice: ")

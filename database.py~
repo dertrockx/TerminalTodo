@@ -87,7 +87,7 @@ class Model:
 			connection.commit()
 		except sqlite3.Error:
 			if connection:
-				print("Error in updating data of row " + kwargs['row_id'] + ". Rolling back to previous status...")
+				print("Error in updating data of row " + kwargs['row_id'] + ". Rolling back to preivous status...")
 				connection.rollback()
 		finally:
 			if connection:
